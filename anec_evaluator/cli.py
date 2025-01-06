@@ -15,13 +15,13 @@ def main():
     # SAGA arguments
     parser.add_argument("--saga_step_size", type=float, default=0.1,
                       help="Step size for SAGA optimization")
-    parser.add_argument("--saga_n_iters", type=int, default=500,
+    parser.add_argument("--saga_n_iters", type=int, default=1000,
                       help="Number of iterations for SAGA optimization")
     parser.add_argument("--device", type=str, default='cuda',
                       help="Device to run computations on (cuda/cpu)")
-    parser.add_argument("--lam", type=float, default=0.01,
+    parser.add_argument("--lam", type=float, default=0.1,
                       help="Maximum lambda value for regularization")
-    parser.add_argument("--batch_size", type=int, default=1024,
+    parser.add_argument("--batch_size", type=int, default=256,
                       help="Batch size for training")
     parser.add_argument("--val_size", type=float, default=0.1,
                       help="Fraction of training data to use for validation")
