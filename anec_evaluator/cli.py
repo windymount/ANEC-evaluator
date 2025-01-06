@@ -29,10 +29,6 @@ def main():
     parser.add_argument("--output_dir", type=str, default='output',
                       help="Directory to save outputs")
     
-    # Legacy arguments (kept for backwards compatibility)
-    parser.add_argument("--filter", type=float, default=0)
-    parser.add_argument("--annotation_dir", type=str, default=None)
-
     args = parser.parse_args()
 
     # Load activations and labels
