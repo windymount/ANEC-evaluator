@@ -6,7 +6,8 @@ import pandas as pd
 import os
 
 
-
+MAX_SAGA_ITER = 100
+MIN_SAGA_LAM_COEFF = 0.001
 @dataclass
 class SAGAArguments:
     saga_step_size: float = 0.1
@@ -43,7 +44,7 @@ def measure_acc(num_concepts, num_classes, num_samples, train_loader, val_loader
     metadata['max_reg']['nongrouped'] = max_lam
     # Solve the GLM path
     max_sparsity = measure_level[-1] / num_concepts
-    output_proj = glm_saga(linear, train_loader, saga_step_size, saga_n_iters, ALPHA, k=50, epsilon=0.005,
+    output_proj = glm_saga(linear, train_loader, saga_step_size, saga_n_iters, ALPHA, k=MAX_SAGA_ITER, epsilon=MIN_SAGA_LAM_COEFF,
                     val_loader=val_loader, test_loader=test_concept_loader, do_zero=False, metadata=metadata, n_ex=num_samples, n_classes=num_classes,
                     max_sparsity=max_sparsity)
     path = output_proj['path']
@@ -129,7 +130,7 @@ def ANEC_test(saga_args: SAGAArguments, train_act, train_labels, test_act, test_
     df = pd.DataFrame(data={'NEC': NEC, 'Accuracy': acc})
     if not os.path.exists(saga_args.output_dir):
         os.makedirs(saga_args.output_dir)
-    df.to_csv(os.path.join(saga_args.output_dir, "metrics.csv"))
+    df.to_csv(os.path.join(saga_args.output_dir, "ACC-NEC-curve.csv"))
     # Save truncated weights
     for NEC in truncated_weights:
         W, b = truncated_weights[NEC]
