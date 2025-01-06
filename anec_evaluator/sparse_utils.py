@@ -82,31 +82,41 @@ def measure_acc(num_concepts, num_classes, num_samples, train_loader, val_loader
     return path, {NEC: weight for NEC, weight in zip(measure_level, weights)}, accs
 
 
-def ANEC_test(saga_args: SAGAArguments, train_act, train_labels, test_act, test_labels):
+def ANEC_test(saga_args: SAGAArguments, train_act, train_labels, test_act, test_labels, val_act=None, val_labels=None):
     # Load arguments
     n_concepts = train_act.shape[1]
     n_classes = train_labels.max() + 1
     n_samples = train_act.shape[0]
     
-    # Create indexed datasets for train and val (needed for SAGA)
+    # Create indexed dataset for train
     train_dataset = IndexedTensorDataset(train_act, train_labels)
-    train_dataset, val_dataset = random_split(train_dataset, [1 - saga_args.val_size, saga_args.val_size])
+    
+    # Handle validation data
+    if val_act is not None and val_labels is not None:
+        # Use provided validation data
+        val_dataset = IndexedTensorDataset(val_act, val_labels)
+        train_loader = DataLoader(train_dataset, batch_size=saga_args.batch_size, shuffle=True)
+    else:
+        # Split training data for validation
+        train_size = int((1 - saga_args.val_size) * len(train_dataset))
+        val_size = len(train_dataset) - train_size
+        train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
+        train_loader = DataLoader(train_dataset, batch_size=saga_args.batch_size, shuffle=True)
     
     # Create regular dataset for test (no index needed)
     test_dataset = TensorDataset(test_act, test_labels)
     
     # Create dataloaders
-    test_concept_loader = DataLoader(test_dataset, batch_size=saga_args.batch_size, shuffle=False)
-    train_concept_loader = DataLoader(train_dataset, batch_size=saga_args.batch_size, shuffle=True)
-    val_concept_loader = DataLoader(val_dataset, batch_size=saga_args.batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=saga_args.batch_size, shuffle=False)
+    val_loader = DataLoader(val_dataset, batch_size=saga_args.batch_size, shuffle=False)
     
     path, truncated_weights, accs = measure_acc(
                             n_concepts,
                             n_classes,
                             n_samples,
-                            train_concept_loader,
-                            val_concept_loader,
-                            test_concept_loader,
+                            train_loader,
+                            val_loader,
+                            test_loader,
                             saga_step_size=saga_args.saga_step_size,
                             saga_n_iters=saga_args.saga_n_iters,
                             device=saga_args.device,

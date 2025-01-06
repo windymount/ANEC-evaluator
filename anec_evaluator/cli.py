@@ -42,6 +42,16 @@ def main():
     train_labels = torch.load(os.path.join(args.load_path, "train_labels.pt"))
     test_act = torch.load(os.path.join(args.load_path, "test_activations.pt"))
     test_labels = torch.load(os.path.join(args.load_path, "test_labels.pt"))
+    
+    # Try to load validation data if available
+    val_act = None
+    val_labels = None
+    try:
+        val_act = torch.load(os.path.join(args.load_path, "val_activations.pt"))
+        val_labels = torch.load(os.path.join(args.load_path, "val_labels.pt"))
+        print("Using provided validation data")
+    except FileNotFoundError:
+        print(f"No validation data found in {args.load_path}, will split from training data")
 
     # Create SAGA arguments from command line args
     saga_args = SAGAArguments(
@@ -55,7 +65,7 @@ def main():
         output_dir=args.output_dir
     )
 
-    accs = ANEC_test(saga_args, train_act, train_labels, test_act, test_labels)
+    accs = ANEC_test(saga_args, train_act, train_labels, test_act, test_labels, val_act, val_labels)
 
     if args.result_file:
         if os.path.exists(args.result_file):
