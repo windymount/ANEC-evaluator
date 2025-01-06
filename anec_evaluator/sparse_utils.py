@@ -78,8 +78,12 @@ def measure_acc(num_concepts, num_classes, num_samples, train_loader, val_loader
             correct.append(pred == y)
         correct = torch.cat(correct)
         accs.append(correct.float().mean().item())
-        print(f"Test Acc: {correct.float().mean():.4f}")
-    print(f"Average acc: {sum(accs) / len(accs):.4f}")
+        print(f"ANEC-{eff_concept_num}: {correct.float().mean():.4f}")
+        print("-"*100)
+    print("\n\nSummary")
+    for eff_concept_num, acc in zip(measure_level, accs):
+        print(f"ANEC-{eff_concept_num:<4}: {acc:.4f}")
+    print(f"ANEC-Avg: {sum(accs) / len(accs):.4f}")
     return path, {NEC: weight for NEC, weight in zip(measure_level, weights)}, accs
 
 
@@ -136,5 +140,8 @@ def ANEC_test(saga_args: SAGAArguments, train_act, train_labels, test_act, test_
         W, b = truncated_weights[NEC]
         torch.save(W, os.path.join(saga_args.output_dir, f"W_g@NEC={NEC:d}.pt"))
         torch.save(b, os.path.join(saga_args.output_dir, f"b_g@NEC={NEC:d}.pt"))
+    # Save summary
+    summary_df = pd.DataFrame(data={'metrics': f"ANEC-{saga_args.measure_level}", 'value': accs})
+    summary_df.to_csv(os.path.join(saga_args.output_dir, "summary.csv"))
     return accs
 

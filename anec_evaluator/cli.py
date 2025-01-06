@@ -9,8 +9,6 @@ def main():
     # Data loading arguments
     parser.add_argument("--load_path", type=str, required=True,
                       help="Path to directory containing activations and labels")
-    parser.add_argument("--result_file", type=str, default=None,
-                      help="Path to save evaluation results")
     
     # SAGA arguments
     parser.add_argument("--saga_step_size", type=float, default=0.1,
@@ -66,15 +64,6 @@ def main():
     )
 
     accs = ANEC_test(saga_args, train_act, train_labels, test_act, test_labels, val_act, val_labels)
-
-    if args.result_file:
-        if os.path.exists(args.result_file):
-            df = pd.read_csv(args.result_file)
-        else:
-            df = pd.DataFrame(columns=['ACC@5', "AVGACC"])
-        row = pd.Series({'ACC@5': accs[0], "AVGACC": sum(accs) / len(accs)})
-        df.loc[len(df.index)] = row
-        df.to_csv(args.result_file, index=False)
 
 if __name__ == "__main__":
     main() 
