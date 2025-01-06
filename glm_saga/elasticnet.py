@@ -531,7 +531,7 @@ def glm_saga(linear, loader, max_lr, nepochs, alpha,
              tol=1e-4, epsilon=0.001, k=100, checkpoint=None, 
              do_zero=True, lr_decay_factor=1, metadata=None, 
              val_loader=None, test_loader=None, lookbehind=None, 
-             family='multinomial', encoder=None, max_sparsity=None): 
+             family='multinomial', encoder=None, max_sparsity=None, min_sparsity=None): 
     if encoder is not None: 
         warnings.warn("encoder argument is deprecated; please use preprocess instead", DeprecationWarning)
         preprocess = encoder
@@ -634,6 +634,10 @@ def glm_saga(linear, loader, max_lr, nepochs, alpha,
                 ch.save(params, os.path.join(checkpoint,f"params{i}.pth"))
             if max_sparsity is not None and nnz/total > max_sparsity:
                 break
+            if nnz < 1 and i > k // 3:
+                warnings.warn(f"Starting lambda too large. Consider reducing it to around {lam:.4f}")
+            if i == 0 and nnz/total > min_sparsity:
+                warnings.warn(f"The smallest target NEC is not reached. Consider increasing starting lambda.")
     return {
         'path' : path, 
         'best' : best_params, 
