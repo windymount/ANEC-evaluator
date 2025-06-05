@@ -1,6 +1,6 @@
 # ANEC Evaluator
 
-This repository contains a tool for evaluating Accuracy under specified Number of Effective Concepts(ANEC), which is a novel metric for Concept Bottleneck Model (CBM), proposed in our work [VLG-CBM: Training Concept Bottleneck Models with Vision-Language Guidance](https://arxiv.org/abs/2408.01432). The code is based on the [glm_saga](https://github.com/MadryLab/glm_saga) repository, and modified to fit our needs.
+This repository contains a tool for evaluating Accuracy under specified Number of Effective Concepts(ANEC), which is a novel metric for Concept Bottleneck Model (CBM), proposed in our work [VLG-CBM: Training Concept Bottleneck Models with Vision-Language Guidance](https://arxiv.org/abs/2408.01432). We separate this tool from [original codebase](https://github.com/Trustworthy-ML-Lab/VLG-CBM) for easier use. The code is based on the [glm_saga](https://github.com/MadryLab/glm_saga) repository, and modified to fit our needs.
 
 <div align="center">
 <h2>
